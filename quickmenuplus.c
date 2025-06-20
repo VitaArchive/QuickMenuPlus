@@ -360,7 +360,7 @@ USED int module_start(UNUSED SceSize args, UNUSED const void *argp) {
 
 	vshPowerSetPsButtonPushTime(config_read_key("pushtime", 500000));
 	standby_is_restart = config_read_key("standbyisrestart", !vshSblAimgrIsDolce());
-	bg_style = config_read_key("bgstyle", BG_STYLE_TRANSLUCENT);
+	bg_style = config_read_key("bgstyle", BG_STYLE_ORIGINAL);
 
 	// get SceShell module info
 	tai_module_info_t minfo;

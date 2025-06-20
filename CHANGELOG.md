@@ -1,5 +1,11 @@
 ### Changelog
 
+#### v3.0.0
+
+- Add configuration to (un)set the Quick Menu background gradient
+- Move to use VitaSDK
+- Changed default background style to "original"
+
 #### v2.0.0
 
 - Merged Quick Power, Quick Volume, and Rapidmenu

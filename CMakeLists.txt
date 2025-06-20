@@ -1,5 +1,6 @@
 # This file is part of Quick Menu Plus
 # Copyright © 2020 浅倉麗子
+# Copyright © 2025 GrayJack
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,21 +16,25 @@
 
 cmake_minimum_required(VERSION 3.13)
 
-set(CMAKE_TOOLCHAIN_FILE "$ENV{DOLCESDK}/share/dolce.toolchain.cmake" CACHE PATH "DolceSDK toolchain file")
-set(DOLCESDK_CMAKE_FILE "$ENV{DOLCESDK}/share/dolce.cmake" CACHE PATH "DolceSDK CMake functions file")
-include("${DOLCESDK_CMAKE_FILE}" REQUIRED)
+if(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
+  if(DEFINED ENV{VITASDK})
+    set(CMAKE_TOOLCHAIN_FILE "$ENV{VITASDK}/share/vita.toolchain.cmake" CACHE PATH "toolchain file")
+  else()
+    message(FATAL_ERROR "Please define VITASDK to point to your SDK path!")
+  endif()
+endif()
 
-option(CMAKE_TLS_VERIFY "Verify TLS" ON)
-include(ExternalProject REQUIRED)
+include("$ENV{VITASDK}/share/vita.cmake" REQUIRED)
+project(quickmenuplus)
 
-project(quickmenuplus LANGUAGES C)
-
-add_compile_options(
-  -Os -std=c11
-  -Wall -Wextra -Wdouble-promotion -Wshadow -Wundef
-  -fsingle-precision-constant -fno-common -flto
-  -ftree-vectorize -funsafe-math-optimizations
-)
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wl,-q -Wall -O3 -nostartfiles -fno-lto -DDEBUG")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-rtti -fno-exceptions")
+# add_compile_options(
+#   -Os -std=c11
+#   -Wall -Wextra -Wdouble-promotion -Wshadow -Wundef
+#   -fsingle-precision-constant -fno-common -flto
+#   -ftree-vectorize -funsafe-math-optimizations
+# )
 
 add_link_options(
   -nostdlib
@@ -54,59 +59,62 @@ endif()
 
 # External dependencies
 
-set(DEP_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/dep")
-include_directories("${DEP_INSTALL_PREFIX}/include")
-link_directories("${DEP_INSTALL_PREFIX}/lib")
-
-ExternalProject_Add(dep-psp2dbg
-  URL https://git.shotatoshounenwachigau.moe/vita/psp2dbg/snapshot/psp2dbg-master.tar.gz
-  PREFIX dep/psp2dbg
-  CMAKE_ARGS -D CMAKE_INSTALL_PREFIX=${DEP_INSTALL_PREFIX}
-  EXCLUDE_FROM_ALL ON
-)
-
-add_custom_target(dep-all
-  DEPENDS dep-psp2dbg
-)
-
-# Build ScePaf stubs
-
-dolce_gen_libs(ScePaf_stubs
-  ScePaf.yml
-  LIB
-    ScePafWidget_stub_weak
-    ScePafToplevel_stub_weak
-)
-
-# Build self
-
-set(ELF "quickmenuplus.elf")
-set(SELF "quickmenuplus.suprx")
-set(MODULE_INFO "quickmenuplus.yml")
-
-add_executable("${ELF}"
+# set(DEP_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/dep")
+add_executable("${PROJECT_NAME}"
   quickmenuplus.c
   config.c
   opcode.c
 )
+target_link_directories("${PROJECT_NAME}" PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 
-target_link_libraries("${ELF}"
-  psp2dbg
+# ExternalProject_Add(dep-psp2dbg
+#   URL https://git.shotatoshounenwachigau.moe/vita/psp2dbg/snapshot/psp2dbg-master.tar.gz
+#   PREFIX dep/psp2dbg
+#   CMAKE_ARGS -D CMAKE_INSTALL_PREFIX=${DEP_INSTALL_PREFIX}
+#   EXCLUDE_FROM_ALL ON
+# )
+
+# add_custom_target(dep-all
+#   DEPENDS dep-psp2dbg
+# )
+
+# Build ScePaf stubs
+
+# vita_gen_libs(ScePaf_stubs
+#   ScePaf.yml
+#   LIB
+#     ScePafWidget_stub_weak
+#     ScePafToplevel_stub_weak
+# )
+
+# Build self
+
+# set(ELF "quickmenuplus.elf")
+# set(SELF "quickmenuplus.suprx")
+# set(MODULE_INFO "quickmenuplus.yml")
+
+# add_executable("${PROJECT_NAME}.elf"
+#   quickmenuplus.c
+#   config.c
+#   opcode.c
+# )
+
+target_link_libraries("${PROJECT_NAME}"
+  # psp2dbg
 
   taihen_stub
-
+  c
   SceAVConfig_stub
   SceLibKernel_stub
-  SceModulemgr_stub
+  SceKernelModulemgr_stub
   ScePafStdc_stub_weak
   ScePafToplevel_stub_weak
   ScePafWidget_stub_weak
-  SceRegMgrForSDK_stub
-  SceShellUtil_stub_weak
+  SceRegistryMgr_stub
+  SceShellSvc_stub_weak
   SceVshBridge_stub
+  SceIofilemgr_stub
+  SceLibDbg_stub
 )
 
-dolce_create_self("${SELF}"
-  "${ELF}"
-  CONFIG "${MODULE_INFO}"
-)
+vita_create_self(${PROJECT_NAME}.suprx ${PROJECT_NAME} CONFIG quickmenuplus.yml UNSAFE)

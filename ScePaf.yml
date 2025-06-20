@@ -9,7 +9,7 @@ modules:
         functions:
           scePafButtonSetRepeat: 0x16479BA7
           scePafWidgetFindById: 0x9D304F4A
-          scePafWidgetSetColour: 0x627CDA4E
+          scePafWidgetSetFilterColor: 0x627CDA4E
       ScePafToplevel:
         kernel: false
         nid: 0x4D9A9DD0

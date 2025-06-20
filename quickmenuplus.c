@@ -22,18 +22,29 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <psp2/avconfig.h>
 #include <psp2/kernel/clib.h>
 #include <psp2/kernel/modulemgr.h>
-#include <psp2/paf.h>
 #include <psp2/registrymgr.h>
-#include <psp2/shellsvc.h>
+#include <psp2/shellutil.h>
 #include <psp2/vshbridge.h>
+#include <paf/std/wchar.h>
+#include <paf/std/string.h>
+#include <paf/std/stdlib.h>
 
-#include <psp2dbg.h>
 #include <taihen.h>
 
 #include "common.h"
 #include "config.h"
 #include "opcode.h"
 #include "scepaf.h"
+
+#define printf sceClibPrintf
+
+#define TAI_NEXT(this_func, hook, ...) ({ \
+  (((struct _tai_hook_user *)hook)->next) != 0 ? \
+    ((__typeof__(&this_func))((struct _tai_hook_user *)((struct _tai_hook_user *)hook)->next)->func)(__VA_ARGS__) \
+  : \
+    ((__typeof__(&this_func))((struct _tai_hook_user *)hook)->old)(__VA_ARGS__) \
+  ; \
+})
 
 #define N_INJECT 3
 static SceUID inject_id[N_INJECT];
@@ -45,10 +56,10 @@ static tai_hook_ref_t hook_ref[N_HOOK];
 static SceUID inject_abs(int idx, void *dest, const void *src, size_t size) {
 	SceUID ret = taiInjectAbs(dest, src, size);
 	if (ret >= 0) {
-		SCE_DBG_LOG_INFO("Injected %d UID %08X\n", idx, ret);
+		printf("Injected %d UID %08X\n", idx, ret);
 		inject_id[idx] = ret;
 	} else {
-		SCE_DBG_LOG_ERROR("Failed to inject %d error %08X\n", idx, ret);
+		printf("Failed to inject %d error %08X\n", idx, ret);
 	}
 	return ret;
 }
@@ -58,10 +69,10 @@ static SceUID inject_abs(int idx, void *dest, const void *src, size_t size) {
 static SceUID hook_offset(int idx, SceUID mod, uint32_t ofs, int th, const void *func) {
 	SceUID ret = taiHookFunctionOffset(hook_ref + idx, mod, 0, ofs, th, func);
 	if (ret >= 0) {
-		SCE_DBG_LOG_INFO("Hooked %d UID %08X\n", idx, ret);
+		printf("Hooked %d UID %08X\n", idx, ret);
 		hook_id[idx] = ret;
 	} else {
-		SCE_DBG_LOG_ERROR("Failed to hook %d error %08X\n", idx, ret);
+		printf("Failed to hook %d error %08X\n", idx, ret);
 	}
 	return ret;
 }
@@ -73,13 +84,13 @@ static int UNINJECT(int idx) {
 	if (inject_id[idx] >= 0) {
 		ret = taiInjectRelease(inject_id[idx]);
 		if (ret == 0) {
-			SCE_DBG_LOG_INFO("Uninjected %d UID %08X\n", idx, inject_id[idx]);
+			printf("Uninjected %d UID %08X\n", idx, inject_id[idx]);
 			inject_id[idx] = -1;
 		} else {
-			SCE_DBG_LOG_ERROR("Failed to uninject %d UID %08X error %08X\n", idx, inject_id[idx], ret);
+			printf("Failed to uninject %d UID %08X error %08X\n", idx, inject_id[idx], ret);
 		}
 	} else {
-		SCE_DBG_LOG_WARNING("Tried to uninject %d but not injected\n", idx);
+		printf("Tried to uninject %d but not injected\n", idx);
 	}
 	return ret;
 }
@@ -89,14 +100,14 @@ static int UNHOOK(int idx) {
 	if (hook_id[idx] >= 0) {
 		ret = taiHookRelease(hook_id[idx], hook_ref[idx]);
 		if (ret == 0) {
-			SCE_DBG_LOG_INFO("Unhooked %d UID %08X\n", idx, hook_id[idx]);
+			printf("Unhooked %d UID %08X\n", idx, hook_id[idx]);
 			hook_id[idx] = -1;
 			hook_ref[idx] = -1;
 		} else {
-			SCE_DBG_LOG_ERROR("Failed to unhook %d UID %08X error %08X\n", idx, hook_id[idx], ret);
+			printf("Failed to unhook %d UID %08X error %08X\n", idx, hook_id[idx], ret);
 		}
 	} else {
-		SCE_DBG_LOG_WARNING("Tried to unhook %d but not hooked\n", idx);
+		printf("Tried to unhook %d but not hooked\n", idx);
 	}
 	return ret;
 }
@@ -341,10 +352,10 @@ static void startup(void) {
 static void cleanup(void) {
 	for (int i = 0; i < N_INJECT; i++) { UNINJECT(i); }
 	for (int i = 0; i < N_HOOK; i++) { UNHOOK(i); }
-	SCE_DBG_FILE_LOGGING_TERM();
 }
 
 USED int module_start(UNUSED SceSize args, UNUSED const void *argp) {
+	printf("QuickMenuPlus Starting...");
 	startup();
 
 	vshPowerSetPsButtonPushTime(config_read_key("pushtime", 500000));
@@ -452,11 +463,11 @@ USED int module_start(UNUSED SceSize args, UNUSED const void *argp) {
 		GLZ(HOOK_OFFSET(6, minfo.modid, bg_plane_init - seg0, 1, bg_plane_init));
 	}
 
-	SCE_DBG_LOG_INFO("module_start success\n");
+	printf("module_start success\n");
 	return SCE_KERNEL_START_SUCCESS;
 
 fail:
-	SCE_DBG_LOG_ERROR("module_start failed\n");
+	printf("module_start failed\n");
 	cleanup();
 	return SCE_KERNEL_START_FAILED;
 }

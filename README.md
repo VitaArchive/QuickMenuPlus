@@ -43,9 +43,9 @@ Put files in the directory `ur0:/data/quickmenuplus` to configure Quick Menu Plu
 
 Dependencies:
 
-- [DolceSDK](https://forum.devchroma.nl/index.php/topic,129.0.html)
-- [psp2dbg](https://git.shotatoshounenwachigau.moe/vita/psp2dbg)
-- [taiHEN](https://git.shotatoshounenwachigau.moe/vita/taihen)
+- [VitaSDK](https://vitasdk.org)
+- [paf-RE](https://github.com/VitaArchive/ScePaf-RE/tree/c-compat)
+
 
 Logging can be configured with CMake variables.
 

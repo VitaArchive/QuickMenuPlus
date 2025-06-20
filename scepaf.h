@@ -19,8 +19,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #ifndef SCEPAF_H
 #define SCEPAF_H
 
-#include <psp2/paf.h>
-
 #define QUICK_MENU_BOX_ID  0x0EE0C8AF
 
 #define POWER_TEXT_ID      0xC24DAB89
@@ -32,6 +30,16 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #define POWEROFF_LABEL_ID  0xFA617A89
 #define POWER_LABEL_ID     0xC75A2636
 #define VOLUME_LABEL_ID    0x33FCE3F2
+
+typedef struct ScePafString {
+	char *data;
+	SceSize length;
+} ScePafString;
+
+typedef struct ScePafWString {
+	SceWChar16 *data;
+	SceSize length;
+} ScePafWString;
 
 typedef struct ScePafStyleVTable ScePafStyleVTable;
 
@@ -82,6 +90,6 @@ const SceWChar16 *scePafLabelFindById(ScePafPlugin*, const ScePafResourceSearchP
 
 ScePafWidget *scePafWidgetFindById(ScePafWidget*, const ScePafResourceSearchParam*, int);
 
-void scePafWidgetSetColour(float, ScePafWidget*, float*, int, int, int, int, int);
+void scePafWidgetSetFilterColor(float, ScePafWidget*, float*, int, int, int, int, int);
 
 #endif

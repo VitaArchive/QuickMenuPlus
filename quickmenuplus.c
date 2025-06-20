@@ -146,8 +146,12 @@ static const SceWChar16 *restart_text[N_LANG] = {
 #define BG_STYLE_TRANSLUCENT 1
 #define BG_STYLE_BLACK       2
 
+#define BG_GRADIENT_OFF 0
+#define BG_GRADIENT_ON 1
+
 static bool standby_is_restart = false;
 static int bg_style = BG_STYLE_ORIGINAL;
+static int bg_gradient = BG_GRADIENT_ON;
 
 static atomic_int system_volume;
 
@@ -224,7 +228,7 @@ static void set_btn_colour(ScePafWidget *widget, SceUInt32 colour) {
 static void set_widget_colour(ScePafWidget *widget, SceUInt32 colour) {
 	float _colour[4];
 	colour_convert_rgba(_colour, colour);
-	scePafWidgetSetColour(0.0, widget, _colour, 0, 0x10001, 0, 0, 0);
+	scePafWidgetSetFilterColor(0.0, widget, _colour, 0, 0x10001, 0, 0, 0);
 }
 
 static void set_power_text(ScePafWidget *parent) {
@@ -342,7 +346,6 @@ static void bg_plane_init_hook(ScePafWidget *r0, int r1, float *r2, float *r3) {
 }
 
 static void startup(void) {
-	SCE_DBG_FILE_LOGGING_INIT("ux0:/quickmenuplus.log");
 	sceClibMemset(inject_id, 0xFF, sizeof(inject_id));
 	sceClibMemset(hook_id, 0xFF, sizeof(hook_id));
 	sceClibMemset(hook_ref, 0xFF, sizeof(hook_ref));
@@ -361,6 +364,7 @@ USED int module_start(UNUSED SceSize args, UNUSED const void *argp) {
 	vshPowerSetPsButtonPushTime(config_read_key("pushtime", 500000));
 	standby_is_restart = config_read_key("standbyisrestart", !vshSblAimgrIsDolce());
 	bg_style = config_read_key("bgstyle", BG_STYLE_ORIGINAL);
+	bg_gradient = config_read_key("bggradient", BG_GRADIENT_ON);
 
 	// get SceShell module info
 	tai_module_info_t minfo;
@@ -454,7 +458,9 @@ USED int module_start(UNUSED SceSize args, UNUSED const void *argp) {
 	}
 
 	// Disable quick menu gradient effect (cmp r0, r0)
+	if (BG_GRADIENT_OFF == bg_gradient) {
 	GLZ(INJECT_ABS(2, (void*)(quick_menu_init + 0x186), "\x80\x42", 2));
+	}
 
 	// Custom style for the Quick Menu background
 	if (bg_style != BG_STYLE_ORIGINAL) {

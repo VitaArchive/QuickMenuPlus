@@ -7,6 +7,7 @@ Quick Menu Plus adds the following features to the Quick Menu on the PlayStation
 - Volume slidebar
 - Faster Quick Menu open time
 - Custom background styles
+- Configurable background gradient
 
 [![quickmenuplus-preview.png](https://git.shotatoshounenwachigau.moe/vita/quickmenuplus/plain/quickmenuplus-preview-small.png?h=assets)](https://git.shotatoshounenwachigau.moe/vita/quickmenuplus/plain/quickmenuplus-preview.png?h=assets)
 
@@ -35,9 +36,11 @@ Put files in the directory `ur0:/data/quickmenuplus` to configure Quick Menu Plu
 
     [![standbyisrestart-preview.png](https://git.shotatoshounenwachigau.moe/vita/quickmenuplus/plain/standbyisrestart-preview-small.png?h=assets)](https://git.shotatoshounenwachigau.moe/vita/quickmenuplus/plain/standbyisrestart-preview.png?h=assets)
 
-- `bgstyle.txt` sets the background style. Put in the file `0` for original, `1` for translucent, and `2` for black. If the file does not exist, the default is translucent. Black can reduce power consumption for OLED screens. The gradient effect is removed in all styles.
+- `bgstyle.txt` sets the background style. Put in the file `0` for original, `1` for translucent, and `2` for black. If the file does not exist, the default is original. Black can reduce power consumption for OLED screens.
 
     [![bgstyle-preview.png](https://git.shotatoshounenwachigau.moe/vita/quickmenuplus/plain/bgstyle-preview-small.png?h=assets)](https://git.shotatoshounenwachigau.moe/vita/quickmenuplus/plain/bgstyle-preview.png?h=assets)
+
+- `bggradient.txt` sets the background gradient effect. Put in the file `0` to disable, and `1` to enable. If the file does not exist, the default is "enabled"
 
 ## Building
 
@@ -52,20 +55,20 @@ Logging can be configured with CMake variables.
 To build dependencies and module:
 
 ```sh
-cmake .
-make dep-all
-make
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build
 ```
 
 ## Contributing
 
-Use [git-format-patch](https://www.git-scm.com/docs/git-format-patch) or [git-request-pull](https://www.git-scm.com/docs/git-request-pull) and email me at <asakurareiko@protonmail.ch>.
+Fell free to open issues and pull requests for the project!
 
 ## Credits
 
 - Princess-of-Sleeping: Tip for SceShellUtil, ScePaf
+- Team CBPS: For the original project
 
 ## See also
 
-- [Discussion](https://forum.devchroma.nl/index.php/topic,78.0.html)
-- [Source repository](https://git.shotatoshounenwachigau.moe/vita/quickmenuplus)
+<!-- - [Discussion](https://forum.devchroma.nl/index.php/topic,78.0.html) -->
+- [Source repository](https://github.com/VitaArchive/QuickMenuPlusMod)

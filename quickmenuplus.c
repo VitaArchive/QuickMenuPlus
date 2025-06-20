@@ -2,6 +2,7 @@
 This file is part of Quick Menu Plus
 Copyright © 2020 浅倉麗子
 Copyright © 2020 Princess-of-Sleeping
+Copyright © 2025 GrayJack
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -37,6 +38,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "scepaf.h"
 
 #define printf sceClibPrintf
+#define PSPLUS_ICON \xF8EB
 
 #define TAI_NEXT(this_func, hook, ...) ({ \
   (((struct _tai_hook_user *)hook)->next) != 0 ? \
@@ -142,12 +144,16 @@ static const SceWChar16 *restart_text[N_LANG] = {
 	u"Yeniden başlatmak",
 };
 
-#define BG_STYLE_ORIGINAL    0
-#define BG_STYLE_TRANSLUCENT 1
-#define BG_STYLE_BLACK       2
+typedef enum {
+	BG_STYLE_ORIGINAL    = 0,
+	BG_STYLE_TRANSLUCENT = 1,
+	BG_STYLE_BLACK       = 2
+} BackgroundStyleConfig;
 
-#define BG_GRADIENT_OFF 0
-#define BG_GRADIENT_ON 1
+typedef enum {
+	BG_GRADIENT_OFF = 0,
+	BG_GRADIENT_ON  = 1
+} BackgroundGradientConfig;
 
 static bool standby_is_restart = false;
 static int bg_style = BG_STYLE_ORIGINAL;
@@ -236,7 +242,7 @@ static void set_power_text(ScePafWidget *parent) {
 	if (box_widget) {
 		ScePafWidget *text_widget = get_widget(box_widget, POWER_TEXT_ID);
 		if (text_widget) {
-			set_widget_labelf(text_widget, u"%s\xF8EB", get_label(POWER_LABEL_ID, u""));
+			set_widget_labelf(text_widget, u"%s", get_label(POWER_LABEL_ID, u""));
 		}
 	}
 }
@@ -244,7 +250,7 @@ static void set_power_text(ScePafWidget *parent) {
 static void set_volume_text(ScePafWidget *parent) {
 	ScePafWidget *text_widget = get_widget(parent, VOLUME_TEXT_ID);
 	if (text_widget) {
-		set_widget_labelf(text_widget, u"%s\xF8EB", get_label(VOLUME_LABEL_ID, u""));
+		set_widget_labelf(text_widget, u"%s", get_label(VOLUME_LABEL_ID, u""));
 	}
 }
 
@@ -459,7 +465,7 @@ USED int module_start(UNUSED SceSize args, UNUSED const void *argp) {
 
 	// Disable quick menu gradient effect (cmp r0, r0)
 	if (BG_GRADIENT_OFF == bg_gradient) {
-	GLZ(INJECT_ABS(2, (void*)(quick_menu_init + 0x186), "\x80\x42", 2));
+		GLZ(INJECT_ABS(2, (void*)(quick_menu_init + 0x186), "\x80\x42", 2));
 	}
 
 	// Custom style for the Quick Menu background

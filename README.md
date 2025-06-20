@@ -9,7 +9,7 @@ Quick Menu Plus adds the following features to the Quick Menu on the PlayStation
 - Custom background styles
 - Configurable background gradient
 
-[![quickmenuplus-preview.png](https://git.shotatoshounenwachigau.moe/vita/quickmenuplus/plain/quickmenuplus-preview-small.png?h=assets)](https://git.shotatoshounenwachigau.moe/vita/quickmenuplus/plain/quickmenuplus-preview.png?h=assets)
+![Overall Preview](./imgs/overall-preview.png)
 
 ## Installation
 
@@ -34,11 +34,13 @@ Put files in the directory `ur0:/data/quickmenuplus` to configure Quick Menu Plu
 
 - `standbyisrestart.txt` sets the standby button to function as a restart button. Put in the file `1` to enable, or `0` to disable. If the file does not exist, the default is enabled on the Vita, and disabled on the PSTV. When this setting is disabled, hold the "Power Off・Restart" button to restart, and press to power off.
 
-    [![standbyisrestart-preview.png](https://git.shotatoshounenwachigau.moe/vita/quickmenuplus/plain/standbyisrestart-preview-small.png?h=assets)](https://git.shotatoshounenwachigau.moe/vita/quickmenuplus/plain/standbyisrestart-preview.png?h=assets)
+    ![Power Preview](./imgs/power-preview.png)
 
 - `bgstyle.txt` sets the background style. Put in the file `0` for original, `1` for translucent, and `2` for black. If the file does not exist, the default is original. Black can reduce power consumption for OLED screens.
 
-    [![bgstyle-preview.png](https://git.shotatoshounenwachigau.moe/vita/quickmenuplus/plain/bgstyle-preview-small.png?h=assets)](https://git.shotatoshounenwachigau.moe/vita/quickmenuplus/plain/bgstyle-preview.png?h=assets)
+    ![Background Style Preview Original](./imgs/bg-preview-og.png)
+    ![Background Style Preview Black](./imgs/bg-preview-black.png)
+    ![Background Style Preview Translucent](./imgs/bg-preview-translucent.png)
 
 - `bggradient.txt` sets the background gradient effect. Put in the file `0` to disable, and `1` to enable. If the file does not exist, the default is "enabled"
 
